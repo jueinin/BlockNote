@@ -5,7 +5,7 @@ import {
   SuggestionMenuState,
   filterSuggestionItems,
 } from "@blocknote/core";
-import { flip, offset, size } from "@floating-ui/react";
+import {flip, offset, Placement, size} from "@floating-ui/react";
 import { FC, useCallback, useMemo } from "react";
 
 import { useBlockNoteEditor } from "../../hooks/useBlockNoteEditor";
@@ -31,6 +31,8 @@ export function SuggestionMenuController<
   props: {
     triggerCharacter: string;
     getItems?: GetItemsType;
+    placement?: Placement,
+    maxHeight?: number,
   } & (ItemType<GetItemsType> extends DefaultReactSuggestionItem
     ? {
         // can be undefined
@@ -55,7 +57,7 @@ export function SuggestionMenuController<
 
   const { triggerCharacter, suggestionMenuComponent } = props;
 
-  const { onItemClick, getItems } = props;
+  const { onItemClick, getItems, maxHeight, placement='bottom-start' } = props;
 
   const onItemClickOrDefault = useMemo(() => {
     return (
@@ -96,7 +98,7 @@ export function SuggestionMenuController<
     state?.referencePos || null,
     2000,
     {
-      placement: "bottom-start",
+      placement: placement,
       middleware: [
         offset(10),
         // Flips the menu placement to maximize the space available, and prevents
@@ -105,7 +107,7 @@ export function SuggestionMenuController<
         size({
           apply({ availableHeight, elements }) {
             Object.assign(elements.floating.style, {
-              maxHeight: `${availableHeight - 10}px`,
+              maxHeight: `${maxHeight || (availableHeight - 10)}px`,
             });
           },
         }),
